@@ -12,6 +12,9 @@ export class User {
     @Column('text')
     fullName: string;
 
+    @Column('text', { nullable: true })
+    password: string;
+
     @Column('bool', { default: false })
     isActive: boolean;
 

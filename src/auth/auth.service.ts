@@ -6,6 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { LoginAuthDto } from './dto/login-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,11 +21,16 @@ export class AuthService {
     
     const userExists = await this.findPerEmail(createAuthDto.email);
     if(!userExists){
-        const userRegister = await this.userRepository.create({
-          email: createAuthDto.email,
-          fullName: createAuthDto.fullName,
-          firebaseUuid: createAuthDto.firebaseUuid,
-        }); 
+
+        const hashedPassword = await this.hashPassword(createAuthDto.password);
+
+          const userRegister = await this.userRepository.create({
+            email: createAuthDto.email,
+            fullName: createAuthDto.fullName,
+            firebaseUuid: createAuthDto.firebaseUuid,
+            password: hashedPassword
+          }); 
+
       await this.userRepository.save(userRegister);
       return {
         email: userRegister.email,
@@ -39,6 +46,52 @@ export class AuthService {
       )
     }
   }
+
+  async login(loginAuthDto: LoginAuthDto) {
+
+    //const hashedPassword = await this.hashPassword(loginAuthDto.password);
+    const user = await this.userRepository.findOne({
+      where: { email: loginAuthDto.email}
+    });
+
+    if(user){
+      
+      const isMatchePassword = await this.comparePassword(loginAuthDto.password, user.password);
+
+      if(!isMatchePassword){
+        throw new BadRequestException(
+          {
+            message: 'Usuario o clave incorrecto',
+            exists: false
+          }
+        )
+      }
+
+      return {
+        email: user.email,
+        fullName: user.fullName,
+        id: user.id
+      };
+
+    }else{
+      throw new BadRequestException(
+        {
+          message: 'Usuario o clave incorrecto',
+          exists: false
+        }
+      )
+    }
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+  }
+
+  async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
+  }
+
 
   findAll() {
     return `This action returns all auth`;
