@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthDto } from '../auth/dto/create-auth.dto';
 import * as admin from 'firebase-admin';
+import { MessageNotificationDto } from 'src/notification/dto/send-notificacion.dto';
 
 @Injectable()
 export class FirebaseService {
@@ -42,4 +43,40 @@ export class FirebaseService {
 
     }
 
+    async sendMessage(messageNotificationDto: MessageNotificationDto){
+        try{
+
+            const newMessage = {
+                fullName: messageNotificationDto.fullName,
+                message: messageNotificationDto.message,
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+            }
+
+            const docRef = await admin.firestore().collection('messages').add(newMessage);
+
+            return { status: 'success', doc: docRef };
+
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    async sendMessageRT(messageNotificationDto: MessageNotificationDto){
+        try{
+
+            const newMessage = {
+                fullName: messageNotificationDto.fullName,
+                message: messageNotificationDto.message,
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+            }
+
+            const messageRef = admin.database().ref('messages').push();
+            await messageRef.set(newMessage);
+
+            return { status: 'success' };
+
+        }catch(error){
+            console.log(error);
+        }
+    }
 }

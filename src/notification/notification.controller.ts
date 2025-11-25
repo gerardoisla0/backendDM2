@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { MessageNotificationDto } from './dto/send-notificacion.dto';
 
 @Controller('notification')
 export class NotificationController {
@@ -12,23 +13,14 @@ export class NotificationController {
     return this.notificationService.send(createNotificationDto);
   }
 
-  @Get()
-  findAll() {
-    return this.notificationService.findAll();
+  @Post('message')
+  message(@Body() messageNotificationDto: MessageNotificationDto) {
+    return this.notificationService.sendMessage(messageNotificationDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.notificationService.findOne(+id);
+  @Post('messageRT')
+  messageRT(@Body() messageNotificationDto: MessageNotificationDto) {
+    return this.notificationService.sendMessageRT(messageNotificationDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNotificationDto: UpdateNotificationDto) {
-    return this.notificationService.update(+id, updateNotificationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationService.remove(+id);
-  }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { FirebaseService } from 'src/firebase/firebase.service';
+import { MessageNotificationDto } from './dto/send-notificacion.dto';
 
 @Injectable()
 export class NotificationService {
@@ -23,19 +24,11 @@ export class NotificationService {
     }
   }
 
-  findAll() {
-    return `This action returns all notification`;
+  async sendMessage(messageNotificationDto: MessageNotificationDto){
+    return this.firebaseService.sendMessage(messageNotificationDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
-
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+  async sendMessageRT(messageNotificationDto: MessageNotificationDto){
+    return this.firebaseService.sendMessageRT(messageNotificationDto);
   }
 }

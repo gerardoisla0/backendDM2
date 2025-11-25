@@ -10,7 +10,8 @@ export class FirebaseModule {
   constructor(){
       let serviceAccount = require("../../dm2-2025-63d43-firebase-adminsdk-fbsvc-10bd589833.json");
       admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: "https://dm2-2025-63d43-default-rtdb.firebaseio.com"
       });
   }
 }
