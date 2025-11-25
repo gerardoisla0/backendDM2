@@ -8,6 +8,7 @@ import { BadRequestException } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class AuthService {
@@ -15,20 +16,19 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly firebaseService: FirebaseService
   ) {}
 
-  async create(createAuthDto: CreateAuthDto) {
+  async register(createAuthDto: CreateAuthDto) {
     
     const userExists = await this.findPerEmail(createAuthDto.email);
     if(!userExists){
-
-        const hashedPassword = await this.hashPassword(createAuthDto.password);
-
+          const { uid } = await this.firebaseService.create(createAuthDto);
           const userRegister = await this.userRepository.create({
             email: createAuthDto.email,
             fullName: createAuthDto.fullName,
-            firebaseUuid: createAuthDto.firebaseUuid,
-            password: hashedPassword
+            firebaseUuid: uid,
+            password: ''
           }); 
 
       await this.userRepository.save(userRegister);
@@ -45,6 +45,7 @@ export class AuthService {
         }
       )
     }
+
   }
 
   async login(loginAuthDto: LoginAuthDto) {

@@ -8,13 +8,14 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('create')  //hostname/auth/create
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('register')  //hostname/auth/register
+  register(@Body() createAuthDto: CreateAuthDto) {
+    return this.authService.register(createAuthDto);
   }
 
   @Post('login')  //hostname/auth/login
   login(@Body() loginAuthDto: LoginAuthDto) {
+    console.log(loginAuthDto);
     return this.authService.login(loginAuthDto);
   }
 
