@@ -12,8 +12,8 @@ export class CreateAuthDto {
     @MaxLength(100)
     fullName: string;
     
-    @IsString()
-    firebaseUuid: string;
+    //@IsString()
+    //firebaseUuid: string;
 
     @IsString()
     @MinLength(6)

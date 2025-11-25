@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthDto } from '../auth/dto/create-auth.dto';
 import * as admin from 'firebase-admin';
 
@@ -16,6 +16,30 @@ export class FirebaseService {
         }catch(error){
             throw new Error(`Failed to create user: ${error.message}`);
         }
+    }
+
+    async verify(token: string): Promise<any>{
+        try{
+            console.log("Verifying token:", token);
+            const decodedToken = await admin.auth().verifyIdToken(token);
+            console.log("Decoded Token:", decodedToken);
+            return decodedToken;
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    async sendNotification(token: string, payload: any){
+        try{
+            //FCM - FIREBASE CLOUD MESSAGING
+            await admin.messaging().send({
+                token: token,
+                notification: payload.notification
+            })
+        }catch(error){
+            console.log(error);
+        }
+
     }
 
 }

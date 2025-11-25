@@ -13,10 +13,10 @@ export class AuthController {
     return this.authService.register(createAuthDto);
   }
 
-  @Post('login')  //hostname/auth/login
+  @Post('checkstatus')  //hostname/auth/checkstatus
   login(@Body() loginAuthDto: LoginAuthDto) {
     console.log(loginAuthDto);
-    return this.authService.login(loginAuthDto);
+    return this.authService.verify(loginAuthDto);
   }
 
   @Get()

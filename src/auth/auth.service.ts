@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { User } from './entities/auth.entity';
@@ -48,9 +48,23 @@ export class AuthService {
 
   }
 
-  async login(loginAuthDto: LoginAuthDto) {
+  async verify(loginAuthDto: LoginAuthDto) {
 
-    //const hashedPassword = await this.hashPassword(loginAuthDto.password);
+    const token = await this.firebaseService.verify(loginAuthDto.token);
+    if(!token)
+      throw new UnauthorizedException('Token inválido o expirado');
+
+    const user = await this.findUserPerEmail(loginAuthDto.email);
+    if(!user)
+      throw new UnauthorizedException('Usuario no encontrado');
+
+    return{
+      email: loginAuthDto.email,
+      firebaseUUID: user.firebaseUuid,
+      fullName: user.fullName,
+    }
+
+    /*const hashedPassword = await this.hashPassword(loginAuthDto.password);
     const user = await this.userRepository.findOne({
       where: { email: loginAuthDto.email}
     });
@@ -81,7 +95,7 @@ export class AuthService {
           exists: false
         }
       )
-    }
+    }*/
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -120,6 +134,13 @@ export class AuthService {
         where: { email }
       });
       return !!user;
+  }
+
+    async findUserPerEmail(email: string) {
+      const user = await this.userRepository.findOne({
+        where: { email }
+      });
+      return user;
   }
 
   async update(id: string, updateAuthDto: UpdateAuthDto) {

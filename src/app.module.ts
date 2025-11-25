@@ -3,6 +3,7 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { FirebaseModule } from './firebase/firebase.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [AuthModule,
@@ -21,6 +22,7 @@ import { FirebaseModule } from './firebase/firebase.module';
       synchronize: true,
     }),
     FirebaseModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [],
